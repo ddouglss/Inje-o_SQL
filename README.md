@@ -1,38 +1,94 @@
-# Vulnerabilidade de Injeção SQL
-O código acima contém uma função chamada login_vulnerable, que é usada para autenticar usuários com base em seu nome de usuário e senha. No entanto, ele é propositalmente vulnerável a ataques de Injeção SQL devido à maneira como a consulta SQL é construída.
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+</head>
+<body>
+    <h1 align="center">Vulnerabilidade de Injeção SQL</h1>
 
-Explicação:
-Construção da Consulta SQL: A função login_vulnerable usa a interpolação de strings para inserir os dados de entrada do usuário (nome de usuário e senha) diretamente na consulta SQL:
+   <section>
+        <p>Bem-vindo à documentação sobre a vulnerabilidade de Injeção SQL. Este documento explora uma função de login vulnerável e fornece orientações sobre como proteger aplicações contra esse tipo de ataque.</p>
+    </section>
 
-query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
+   <h2 align="center">Demonstração da Vulnerabilidade</h2>
+    <p align="center">
+        <img src="https://example.com/path-to-image.png" alt="Demonstração da Vulnerabilidade" />
+    </p>
 
-Esse método é perigoso porque não sanitiza nem valida as entradas fornecidas pelo usuário. Um invasor pode explorar essa vulnerabilidade para injetar código SQL que altera a lógica da consulta.
+  <section>
+        <h2>Descrição do Problema</h2>
+        <p>O código abaixo apresenta uma função chamada <code>login_vulnerable</code>, usada para autenticar usuários com base em nome de usuário e senha. Esta função é propositalmente vulnerável a ataques de Injeção SQL devido à construção insegura da consulta SQL.</p>
+    </section>
 
-Possível Exploração: Um usuário mal-intencionado pode inserir dados maliciosos para manipular a consulta SQL. Por exemplo, ao inserir o seguinte como nome de usuário:
+  <section>
+        <h2>Explicação da Vulnerabilidade</h2>
 
-' OR '1'='1
+   <h3>Construção da Consulta SQL</h3>
+        <p>A função <code>login_vulnerable</code> utiliza interpolação de strings para construir a consulta SQL:</p>
+        <pre><code>query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"</code></pre>
+        <p>Este método não realiza a sanitização ou validação das entradas fornecidas pelo usuário, tornando o código vulnerável a ataques de Injeção SQL.</p>
 
-A consulta SQL gerada seria:
-SELECT * FROM users WHERE username = '' OR '1'='1' AND password = '';
+  <h3>Possível Exploração</h3>
+        <p>Um usuário mal-intencionado pode inserir dados manipulativos para alterar a lógica da consulta SQL. Por exemplo, ao inserir o seguinte como nome de usuário:</p>
+        <pre><code>' OR '1'='1</code></pre>
+        <p>A consulta SQL gerada será:</p>
+        <pre><code>SELECT * FROM users WHERE username = '' OR '1'='1' AND password = ''</code></pre>
+        <p>A condição <code>'1'='1'</code> sempre é verdadeira, permitindo ao invasor contornar a autenticação e acessar todos os registros do banco de dados.</p>
 
-A condição '1'='1' é sempre verdadeira, permitindo que o invasor contorne a autenticação e recupere todos os registros de usuários do banco de dados.
+   <h3>Implicações de Segurança</h3>
+        <p>Explorar essa vulnerabilidade pode permitir a um invasor:</p>
+        <ul>
+            <li><b>Acesso Não Autorizado:</b> Contornar o sistema de autenticação.</li>
+            <li><b>Recuperação de Dados Sensíveis:</b> Obter informações confidenciais do banco de dados.</li>
+            <li><b>Manipulação ou Destruição de Dados:</b> Alterar ou excluir informações no banco de dados.</li>
+         <li><b>Execução de Operações Administrativas:</b> Realizar operações com permissões administrativas, dependendo do banco de dados.</li>
+  </ul>
+  </section>
 
-Implicações de Segurança: Ao explorar essa vulnerabilidade, um invasor pode:
+  <section>
+        <h2>Prevenção de Injeção SQL</h2>
+        <p>Para evitar vulnerabilidades de Injeção SQL, as entradas do usuário devem ser validadas e consultas parametrizadas devem ser usadas. No SQLite (e na maioria dos bancos de dados SQL), isso pode ser feito usando placeholders (<code>?</code>) e vinculando as entradas corretamente:</p>
+        <pre><code>cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))</code></pre>
 
-Obter acesso não autorizado ao sistema.
-Recuperar dados sensíveis do banco de dados (como credenciais de usuários).
-Manipular ou destruir dados dentro do banco de dados.
-Executar operações administrativas, dependendo das permissões do banco de dados.
-Como Prevenir Injeção SQL: Para evitar vulnerabilidades de Injeção SQL, as entradas do usuário devem ser sempre validadas, e consultas parametrizadas devem ser usadas. No SQLite (e na maioria dos bancos de dados SQL), isso pode ser feito usando placeholders (?) e vinculando as entradas corretamente:
+  <h3>Exemplo de Consulta Segura</h3>
+        <p>Aqui está um exemplo de uma função segura para autenticação:</p>
+        <pre><code>def login_safe(cursor, username, password):
+    query = "SELECT * FROM users WHERE username = ? AND password = ?"
+    cursor.execute(query, (username, password))
+    return cursor.fetchall()</code></pre>
+        <p>Consultas parametrizadas garantem que as entradas do usuário sejam tratadas como dados e não como parte da consulta SQL, prevenindo ataques de Injeção SQL.</p>
+  </section>
 
-cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+  <section>
+        <h2>Interface de Usuário</h2>
+        <p>A interface de login usa campos de entrada de texto e um botão para simular o processo de login. Ao clicar no botão, a consulta SQL vulnerável é executada no backend, o que pode levar a uma brecha de segurança.</p>
+  </section>
 
-Widgets e Interface: A interface de login usa ipywidgets para criar campos de entrada de texto e um botão para simular o processo de login. As credenciais do usuário são inseridas nos campos de texto e, ao clicar no botão de login, a consulta SQL vulnerável é executada no backend, o que pode levar a uma brecha de segurança.
+  <section>
+        <h2>Como Executar o Projeto</h2>
+        <ol>
+            <li>Clone o repositório: <pre><code>git clone https://github.com/seu-usuario/vulnerabilidade-sql.git</code></pre></li>
+            <li>Abra o projeto no seu editor de código.</li>
+            <li>Revise o código para entender as vulnerabilidades e as práticas de prevenção.</li>
+        </ol>
+  </section>
 
-Exemplo de Consulta Segura
-def login_safe(cursor, username, password):
-query = "SELECT * FROM users WHERE username = ? AND password = ?"
-cursor.execute(query, (username, password))
-return cursor.fetchall()
+   <section>
+        <h2>Contribuições</h2>
+        <p>Quer contribuir para o projeto? Sinta-se à vontade para fazer um fork, criar uma nova branch, e submeter um pull request. Suas contribuições para melhorar a segurança são bem-vindas!</p>
+    </section>
 
-Usando consultas parametrizadas, o banco de dados trata as entradas do usuário como dados, e não como parte da consulta SQL em si, prevenindo assim os ataques de Injeção SQL.
+  <footer>
+        <h1 align="center">Contato</h1>
+        <p align="left">Para mais informações, entre em contato:</p>
+        <ul>
+            <li>Douglas Souza Silva - <a href="mailto:ddouglss1999@gmail.com">ddouglss1999@gmail.com</a></li>
+            <li>Guilherme Guimarães - <a href="mailto:guiguimaraes906@gmail.com">guiguimaraes906@gmail.com</a></li>
+          
+        </ul>
+        <p>Muito obrigado!</p>
+    </footer>
+</body>
+</html>
